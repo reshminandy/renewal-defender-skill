@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Renewal Defender Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F2F4F6; --surface:#FFFFFF; --ink:#14202B; --muted:#5A6774; --line:#D4DAE0;
+  --attack:#B4233A; --attack-soft:#FBE9EC;
+  --defend:#0E6B5C; --defend-soft:#E2F3EF;
+  --amber:#96590A; --amber-soft:#FBF0DC;
+  --focus:#1F5FBF;
+  --display:"IBM Plex Sans Condensed","Arial Narrow",Arial,sans-serif;
+  --body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0E141A; --surface:#172029; --ink:#E7EDF2; --muted:#96A3B0; --line:#2B3743;
+    --attack:#F26D82; --attack-soft:#3A1920;
+    --defend:#4CC8B2; --defend-soft:#12332E;
+    --amber:#E4A84A; --amber-soft:#3A2B10;
+    --focus:#7FB2FF;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0E141A; --surface:#172029; --ink:#E7EDF2; --muted:#96A3B0; --line:#2B3743;
+  --attack:#F26D82; --attack-soft:#3A1920;
+  --defend:#4CC8B2; --defend-soft:#12332E;
+  --amber:#E4A84A; --amber-soft:#3A2B10;
+  --focus:#7FB2FF;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45}
+.wrap{max-width:1120px;margin:0 auto;padding:28px 20px 40px;display:flex;flex-direction:column;gap:18px}
+.mono{font-family:var(--mono);font-size:.82em}
+h1,h2{font-family:var(--display);font-weight:600;margin:0;text-wrap:balance}
+h1{font-size:34px;line-height:1.1;letter-spacing:-.01em}
+h2{font-size:17px;letter-spacing:.02em;text-transform:uppercase}
+.eyebrow{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.lede{max-width:66ch;color:var(--muted);margin:6px 0 0}
+header{display:flex;flex-direction:column;gap:6px}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.steps{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 520px;list-style:none;margin:0;padding:0}
+.steps button{font:500 13px var(--body);color:var(--muted);background:transparent;border:1px solid var(--line);
+  border-radius:3px;padding:7px 10px;cursor:pointer;display:flex;gap:7px;align-items:center}
+.steps button .n{font-family:var(--mono);font-size:11px}
+.steps button.done{color:var(--ink);border-color:var(--muted)}
+.steps button.on{color:var(--surface);background:var(--ink);border-color:var(--ink)}
+.ctl{display:flex;gap:6px}
+.ctl button{font:500 13px var(--body);color:var(--ink);background:var(--surface);border:1px solid var(--line);
+  border-radius:3px;padding:7px 12px;cursor:pointer;min-width:64px}
+.ctl button.primary{background:var(--attack);border-color:var(--attack);color:#fff}
+:root[data-theme="dark"] .ctl button.primary{color:#14080B}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ctl button.primary{color:#14080B}}
+button:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.now{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:start;
+  background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--attack);padding:14px 16px}
+.now.defending{border-left-color:var(--defend)}
+.now h2{margin-bottom:4px}
+.now p{margin:0;max-width:64ch}
+.count{display:grid;grid-template-columns:repeat(4,auto);gap:4px 20px;font-variant-numeric:tabular-nums}
+.count div{display:flex;flex-direction:column}
+.count b{font-family:var(--display);font-size:26px;line-height:1;font-weight:600}
+.count span{font-size:11.5px;color:var(--muted);white-space:nowrap}
+.count .open b{color:var(--attack)}
+.count .closed b{color:var(--defend)}
+.panel{background:var(--surface);border:1px solid var(--line)}
+.panel>.head{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;
+  padding:12px 16px;border-bottom:1px solid var(--line)}
+.panel>.head small{color:var(--muted);font-size:12.5px}
+.scroll{overflow-x:auto}
+.ledger{min-width:680px}
+.lrow{display:grid;grid-template-columns:minmax(250px,36%) 1fr;border-bottom:1px solid var(--line);min-height:54px}
+.lrow:last-child{border-bottom:0}
+.lrow.axis{min-height:0}
+.cell{padding:9px 14px 9px 16px;display:flex;flex-direction:column;gap:3px;justify-content:center;
+  opacity:.16;transition:opacity .45s}
+.lrow.shown .cell{opacity:1}
+.cell .t{font-weight:500;font-size:13.5px}
+.cell .m{display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:var(--muted)}
+.chip{font:500 11.5px var(--body);padding:1px 7px;border-radius:2px;border:1px solid transparent;
+  opacity:0;transform:translateY(3px);transition:opacity .35s,transform .35s;white-space:nowrap}
+.lrow.judged .chip{opacity:1;transform:none}
+.chip.kept{color:var(--defend);background:var(--defend-soft)}
+.chip.partly{color:var(--amber);background:var(--amber-soft)}
+.chip.missed{color:var(--attack);background:var(--attack-soft)}
+.chip.gap{color:var(--muted);border:1px dashed var(--muted)}
+.lane{position:relative;border-left:1px solid var(--line);
+  background:
+    linear-gradient(to right,transparent calc(73.33% - 1px),var(--ink) calc(73.33% - 1px),var(--ink) 73.33%,transparent 73.33%),
+    repeating-linear-gradient(to right,transparent 0,transparent calc(20% - 1px),var(--line) calc(20% - 1px),var(--line) 20%)}
+.lane::after{content:"";position:absolute;top:0;bottom:0;left:86.67%;border-left:1px dashed var(--attack)}
+.lane .future{position:absolute;top:0;bottom:0;left:73.33%;right:0;background:var(--bg);opacity:.55}
+.axis .lane{height:44px;background:none}
+.axis .lane::after{display:none}
+.axis .yr{position:absolute;bottom:5px;font-family:var(--mono);font-size:11px;color:var(--muted);transform:translateX(-50%)}
+.axis .mk{position:absolute;top:5px;font:600 11px var(--body);transform:translateX(-50%);padding:1px 5px;border-radius:2px}
+.axis .mk.nowm{background:var(--ink);color:var(--surface)}
+.axis .mk.rfp{color:var(--attack);border:1px dashed var(--attack)}
+.axis .mk.end{transform:translateX(-100%);color:var(--muted)}
+.axis .cell{opacity:1;font-size:12px;color:var(--muted)}
+.pin{position:absolute;top:50%;width:11px;height:11px;margin:-5.5px 0 0 -5.5px;background:var(--attack);
+  transform:rotate(45deg) scale(0);transition:transform .4s cubic-bezier(.3,1.6,.5,1),background .4s,border-radius .4s,box-shadow .4s}
+.pin.up{transform:rotate(45deg) scale(1)}
+.pin.unk{background:var(--surface);border:2px dashed var(--muted)}
+.pin.safe{background:var(--surface);border-radius:50%;box-shadow:inset 0 0 0 2.5px var(--defend);border:0}
+.bank{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--defend);
+  opacity:0;transition:opacity .4s}
+.lrow.judged .bank{opacity:1}
+.legend{display:flex;gap:16px;flex-wrap:wrap;padding:9px 16px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:9px;height:9px;margin-right:6px;vertical-align:-1px}
+.legend .o{background:var(--attack);transform:rotate(45deg)}
+.legend .u{border:2px dashed var(--muted);transform:rotate(45deg)}
+.legend .s{border-radius:50%;box-shadow:inset 0 0 0 2.5px var(--defend)}
+.sheet{list-style:none;margin:0;padding:0;min-width:760px}
+.atk{display:grid;grid-template-columns:44px minmax(0,1.5fr) 190px minmax(0,1.2fr);gap:14px;align-items:center;
+  padding:11px 16px;border-bottom:1px solid var(--line);background:var(--surface)}
+.atk:last-child{border-bottom:0}
+.atk[hidden]{display:none}
+.atk.in{animation:slide .45s both}
+@keyframes slide{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+.rank{font-family:var(--display);font-weight:600;font-size:20px;color:var(--muted)}
+.atk.ranked .rank{color:var(--ink)}
+.say q{font-weight:500;font-size:14.5px;quotes:"\201C" "\201D";color:var(--attack);transition:color .5s}
+.atk.defended .say q{color:var(--ink)}
+.say .meta{font-size:12px;color:var(--muted);margin-top:3px}
+.score{display:grid;grid-template-columns:auto 1fr auto;gap:3px 8px;align-items:center;font-size:11px;color:var(--muted)}
+.meter{height:6px;background:var(--line);position:relative}
+.meter i{position:absolute;inset:0 auto 0 0;width:0;background:var(--attack);transition:width .5s}
+.atk.defended .meter i{background:var(--muted)}
+.total{grid-row:1 / span 3;grid-column:3;font-family:var(--display);font-weight:600;font-size:24px;color:var(--ink);
+  min-width:52px;text-align:right;font-variant-numeric:tabular-nums;opacity:0;transition:opacity .4s}
+.total small{font-size:12px;color:var(--muted);font-weight:500}
+.atk.scored .total{opacity:1}
+.def{display:flex;flex-direction:column;gap:4px;align-items:flex-start;opacity:0;transform:scale(1.06);
+  transition:opacity .35s,transform .35s}
+.atk.defended .def{opacity:1;transform:none}
+.stamp{font:600 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border:1.5px solid currentColor;border-radius:2px}
+.stamp.prove,.stamp.remediate{color:var(--defend)}
+.stamp.reframe{color:var(--amber)}
+.stamp.concede{color:var(--ink)}
+.def p{margin:0;font-size:13px}
+.empty{padding:22px 16px;color:var(--muted);font-size:13.5px}
+.thead{display:grid;grid-template-columns:44px minmax(0,1.5fr) 190px minmax(0,1.2fr);gap:14px;padding:7px 16px;
+  font-size:11.5px;color:var(--muted);border-bottom:1px solid var(--line);min-width:760px;text-transform:uppercase;letter-spacing:.05em}
+.out{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);
+  opacity:.35;transition:opacity .5s}
+.out.live{opacity:1}
+.out div{background:var(--surface);padding:13px 16px}
+.out b{display:block;font-family:var(--display);font-size:16px;font-weight:600;margin-bottom:2px}
+.out span{font-size:13px;color:var(--muted)}
+footer{font-size:12px;color:var(--muted);max-width:80ch}
+@media (max-width:720px){
+  h1{font-size:27px}
+  .now{grid-template-columns:1fr}
+  .count{grid-template-columns:repeat(4,1fr);gap:4px 10px}
+  .count span{white-space:normal}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+}
+:root{--cust:#1F5FBF;--third:#6B7785}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--cust:#7FB2FF;--third:#A9B4BF}}
+:root[data-theme="dark"]{--cust:#7FB2FF;--third:#A9B4BF}
+.two{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:1px;background:var(--line)}
+.two>div{background:var(--surface);padding:13px 16px;display:flex;flex-direction:column;gap:10px}
+.sub{font:600 12px var(--body);color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.form{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:6px}
+.fchip{border:1px solid var(--line);border-radius:3px;padding:6px 9px;font-size:13px;display:flex;justify-content:space-between;gap:8px;
+  opacity:.25;transition:opacity .4s,border-color .4s}
+.fchip.shown{opacity:1;border-color:var(--muted)}
+.fchip small{font:500 11px var(--mono);color:var(--muted);white-space:nowrap}
+.fchip.req small{color:var(--attack)}
+.fchip.best small{color:var(--defend)}
+.conf{align-self:flex-start;font:600 11.5px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--amber);
+  border:1.5px solid currentColor;border-radius:2px;padding:2px 8px;opacity:0;transition:opacity .4s}
+.conf.shown{opacity:1}
+.months{display:grid;grid-template-columns:repeat(12,1fr);gap:3px;align-items:end;height:74px}
+.months i{display:block;background:var(--line);transition:background .4s}
+.months i.w12{background:var(--muted)}
+.months i.w6{background:var(--ink)}
+.months i.w3{background:var(--attack)}
+.wlab{display:flex;flex-direction:column;gap:3px;font-size:13px}
+.wlab span{opacity:.2;transition:opacity .4s;display:flex;gap:8px;align-items:baseline}
+.wlab span.shown{opacity:1}
+.wlab b{font:600 12px var(--mono);min-width:74px}
+.wlab .k12 b{color:var(--muted)} .wlab .k6 b{color:var(--ink)} .wlab .k3 b{color:var(--attack)}
+.ebar{display:flex;height:34px;background:var(--bg);border:1px solid var(--line);margin:14px 16px 6px;overflow:hidden}
+.ebar i{display:block;width:0;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.sT{background:var(--defend)} .sN{background:var(--defend);opacity:.55} .sL{background:var(--attack)}
+.sU{background:var(--amber)} .sV{background:var(--attack)} .sC{background:var(--cust)} .sP{background:var(--third)}
+.ebar i+i{box-shadow:inset 1px 0 0 var(--surface)}
+.elist{list-style:none;margin:0;padding:0 0 6px;min-width:620px}
+.elist li{display:grid;grid-template-columns:16px minmax(0,1fr) 110px 90px;gap:10px;align-items:center;padding:6px 16px;
+  font-size:13.5px;opacity:0;transform:translateX(-8px);transition:opacity .4s,transform .4s;font-variant-numeric:tabular-nums}
+.elist li.shown{opacity:1;transform:none}
+.elist li.child{padding-left:38px}
+.elist li.struck .lab{color:var(--muted)}
+.elist .sw{width:11px;height:11px}
+.elist .own{font:500 11.5px var(--mono);color:var(--muted)}
+.elist .hrs{text-align:right;font-weight:500}
+.atk2{display:grid;grid-template-columns:44px minmax(0,1.5fr) 64px minmax(0,1.25fr);gap:14px;align-items:center;
+  padding:11px 16px;border-bottom:1px solid var(--line);background:var(--surface);min-width:760px}
+.atk2:last-child{border-bottom:0}
+.atk2[hidden]{display:none}
+.atk2.in{animation:slide .45s both}
+.atk2 .rank{color:var(--ink)}
+.atk2 .tot{font-family:var(--display);font-weight:600;font-size:22px;font-variant-numeric:tabular-nums}
+.atk2 .tot small{font-size:12px;color:var(--muted);font-weight:500}
+.atk2 .def{opacity:0;transform:scale(1.05);transition:opacity .4s .7s,transform .4s .7s}
+.atk2.in .def{opacity:1;transform:none}
+.atk2.in .say q{color:var(--ink);transition:color .5s .9s}
+.thead2{display:grid;grid-template-columns:44px minmax(0,1.5fr) 64px minmax(0,1.25fr);gap:14px;padding:7px 16px;font-size:11.5px;
+  color:var(--muted);border-bottom:1px solid var(--line);min-width:760px;text-transform:uppercase;letter-spacing:.05em}
+@media (max-width:720px){.two{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="eyebrow">AI concept &middot; renewal deals</div>
+  <h1>Renewal Defender</h1>
+  <p class="lede">A Claude skill that reconciles the hours we deployed against the work produced, finds the leaked effort and who owns each cause, and writes the attack sheet a challenger would build from the same facts.</p>
+</header>
+<div class="bar">
+  <ol class="steps" id="steps"></ol>
+  <div class="ctl">
+    <button id="back" type="button">Back</button>
+    <button id="play" type="button" class="primary">Pause</button>
+    <button id="next" type="button">Next</button>
+  </div>
+</div>
+<section class="now" id="now" aria-live="polite">
+  <div>
+    <h2 id="nowT"></h2>
+    <p id="nowP"></p>
+  </div>
+  <div class="count">
+    <div><b id="cH">0</b><span>hours deployed</span></div>
+    <div class="closed"><b id="cE">0</b><span>hours explained</span></div>
+    <div class="open"><b id="cU">0</b><span>hours unexplained</span></div>
+    <div><b id="cA">0</b><span>attacks answered</span></div>
+  </div>
+</section>
+<section class="panel">
+  <div class="head"><h2>What goes in</h2><small>One data form, and three windows of evidence.</small></div>
+  <div class="two">
+    <div>
+      <span class="sub">Data form</span>
+      <div class="form" id="form"></div>
+      <span class="conf" id="conf">Confidence: partial</span>
+    </div>
+    <div>
+      <span class="sub">Evidence windows, by month</span>
+      <div class="months" id="months"></div>
+      <div class="wlab">
+        <span class="k12"><b>12 months</b>Baseline and direction of travel</span>
+        <span class="k6"><b>6 months</b>The steady state, and a check on the quarter</span>
+        <span class="k3"><b>3 months</b>The reconciliation</span>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="panel">
+  <div class="head"><h2>Effort reconciliation, last three months</h2><small>Hours deployed, less volume at the supplied norm, less recorded non-ticket work.</small></div>
+  <div class="ebar" id="ebar"></div>
+  <div class="scroll"><ul class="elist" id="elist"></ul></div>
+</section>
+<section class="panel">
+  <div class="head"><h2>Challenger attack sheet</h2><small>Internal. The operations X-ray is the version shared with the customer.</small></div>
+  <div class="scroll">
+    <div class="thead2"><span>Rank</span><span>What the challenger will say</span><span>Score</span><span>Our defence</span></div>
+    <div class="empty" id="empty">The attack sheet is written at step 6, from the leak map.</div>
+    <ol class="sheet" id="sheet" style="min-width:760px"></ol>
+  </div>
+</section>
+<section class="out" id="out">
+  <div><b>Every deployed hour accounted for</b><span>By work type, cause and owner, with the residual stated.</span></div>
+  <div><b>Leak on three sides</b><span>Ours to remove, the customer's to decide, a third party's to fix.</span></div>
+  <div><b>An OpEx offer with evidence</b><span>The reduction is funded by removed leak.</span></div>
+  <div><b>Two documents</b><span>An internal attack sheet, and an operations X-ray for the customer.</span></div>
+</section>
+<footer>Account and figures are invented to illustrate the method. The skill never assumes a productivity norm: the user supplies the norm in force today, and without it the skill reports actual hours per unit and stops.</footer>
+</div>
+<script>
+(function(){
+  var TOTAL=19200;
+  var FORM=[
+    {t:"A. Engagement",l:"minimum",c:""},
+    {t:"B. Productivity norms",l:"required",c:"req"},
+    {t:"C. Volume",l:"best",c:"best"},
+    {t:"D. Effort",l:"minimum",c:""},
+    {t:"E. Metrics",l:"best",c:"best"},
+    {t:"F. Non-ticket work",l:"minimum",c:""},
+    {t:"G. Context",l:"minimum",c:""}
+  ];
+  var VOL=[52,48,61,55,50,58,74,57,54,60,56,63];
+  var SEG=[
+    {k:"T",c:"sT",h:11400,l:"Ticket work, at the norm supplied",o:""},
+    {k:"N",c:"sN",h:2300,l:"Non-ticket work, recorded",o:""},
+    {k:"L",c:"sL",h:5500,l:"Leaked effort: 29% of hours deployed",o:""},
+    {k:"U",c:"sU",h:2300,l:"Work the customer asked for, never registered",o:"Shared",child:1},
+    {k:"V1",c:"sV",h:1300,l:"Knowledge gap and rework",o:"Vendor",child:1},
+    {k:"V2",c:"sV",h:500,l:"Hand-offs between L1, L2 and L3",o:"Vendor",child:1},
+    {k:"C1",c:"sC",h:700,l:"Waiting for change-board approval",o:"Customer",child:1},
+    {k:"C2",c:"sC",h:400,l:"Known error with no funded fix",o:"Customer",child:1},
+    {k:"P1",c:"sP",h:300,l:"Another vendor's release out of sync",o:"Third party",child:1}
+  ];
+  var CAUSES=["V1","V2","C1","C2","P1"];
+  var ATK=[
+    {q:"Close to a third of what you pay for cannot be tied to any work.",m:"Leak of 29% in the last quarter",t:14,d:"reframe",dl:"Reframe, then remediate",p:"12 points are work the customer asked for. Register it and report it monthly."},
+    {q:"A year on, the same team and the same resolution time.",m:"MTTR flat for 12 months",t:13,d:"concede",dl:"Concede",p:"State it first. Commit an MTTR target backed by service credits."},
+    {q:"Their people wait and you pay.",m:"700 hours waiting for approval",t:11,d:"reframe",dl:"Reframe",p:"The wait sits in the customer's change board. Propose pre-approved standard changes."},
+    {q:"They keep fixing the same fault.",m:"400 hours on one known error",t:10,d:"prove",dl:"Prove",p:"Fix proposed earlier, funding declined. Re-present it with the cost of recurrence."}
+  ];
+  var SCENES=[null,
+    {n:"Data form",max:8,t:"1. Start from the data form",p:"The account team fills in what it has. The productivity norm must come from the user. Everything else can be marked not available, and the result carries a confidence level."},
+    {n:"Windows",max:3,t:"2. Read 12, 6 and 3 months",p:"Twelve months give the baseline. Six show the steady state. The last three are reconciled. Older years are left out because too much has changed."},
+    {n:"Reconcile",max:3,t:"3. Reconcile hours against work",p:"Hours deployed, less ticket volume at the norm, less recorded non-ticket work. What is left is leaked effort: paid for, and not traceable."},
+    {n:"Test",max:2,t:"4. Test the data, then find unregistered work",p:"Bulk closures, paused SLA clocks and default timesheets can create a false gap. Then the skill looks for work that was done and never reported to the customer."},
+    {n:"Attribute",max:5,t:"5. Attribute the rest to a cause and an owner",p:"Each remaining hour goes to a cause on our side, the customer's side or a third party's. Whatever cannot be explained is reported as unexplained."},
+    {n:"Attack sheet",max:4,t:"6. Write the attack sheet and the defence",p:"Each finding becomes the sentence a challenger would say, with one honest defence: prove, reframe, remediate or concede."}
+  ];
+  var LAST=6;
+  var $=function(id){return document.getElementById(id)};
+  var fmt=function(n){return n.toLocaleString("en-US")};
+  var s=1,k=0,playing=true,timer=null;
+  var reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var stepsEl=$("steps");
+  for(var i=1;i<=LAST;i++){(function(i){
+    var li=document.createElement("li"),b=document.createElement("button");
+    b.type="button";b.innerHTML='<span class="n">'+i+'</span>'+SCENES[i].n;
+    b.addEventListener("click",function(){jump(i)});
+    li.appendChild(b);stepsEl.appendChild(li);
+  })(i)}
+  FORM.forEach(function(f,i){
+    var d=document.createElement("div");d.className="fchip "+f.c;d.id="f"+i;
+    d.innerHTML='<span>'+f.t+'</span><small>'+f.l+'</small>';$("form").appendChild(d);
+  });
+  VOL.forEach(function(v,i){
+    var b=document.createElement("i");b.style.height=v+"%";b.id="m"+i;$("months").appendChild(b);
+  });
+  SEG.forEach(function(g){
+    var b=document.createElement("i");b.className=g.c;b.id="b"+g.k;$("ebar").appendChild(b);
+    var li=document.createElement("li");li.id="e"+g.k;if(g.child)li.className="child";
+    li.innerHTML='<span class="sw '+g.c+'"></span><span class="lab">'+g.l+'</span><span class="own">'+g.o+'</span><span class="hrs">'+fmt(g.h)+' h</span>';
+    $("elist").appendChild(li);
+  });
+  $("ebar").appendChild($("bL"));
+  ATK.forEach(function(a,i){
+    var li=document.createElement("li");li.className="atk2";li.id="a"+i;li.hidden=true;
+    li.innerHTML='<div class="rank">'+(i+1)+'</div>'+
+      '<div class="say"><q>'+a.q+'</q><div class="meta">'+a.m+'</div></div>'+
+      '<div class="tot">'+a.t+'<small>/15</small></div>'+
+      '<div class="def"><span class="stamp '+a.d+'">'+a.dl+'</span><p>'+a.p+'</p></div>';
+    $("sheet").appendChild(li);
+  });
+  function render(){
+    var fShown=s>1?7:Math.min(k,7), conf=s>1||k>=8;
+    var w=s>2?3:(s===2?k:0);
+    var rec=s>3?3:(s===3?k:0);
+    var split=s>4||(s===4&&k>=2), tested=s>4||(s===4&&k>=1);
+    var cau=s>5?5:(s===5?k:0);
+    var aShown=s===6?k:0;
+    FORM.forEach(function(f,i){$("f"+i).classList.toggle("shown",i<fShown)});
+    $("conf").classList.toggle("shown",conf);
+    VOL.forEach(function(v,i){
+      var el=$("m"+i);
+      el.classList.toggle("w12",w>=1);el.classList.toggle("w6",w>=2&&i>=6);el.classList.toggle("w3",w>=3&&i>=9);
+    });
+    document.querySelector(".k12").classList.toggle("shown",w>=1);
+    document.querySelector(".k6").classList.toggle("shown",w>=2);
+    document.querySelector(".k3").classList.toggle("shown",w>=3);
+    var on={T:rec>=1,N:rec>=2,L:rec>=3&&!split,U:split};
+    CAUSES.forEach(function(c,i){on[c]=i<cau});
+    var explained=0, rest=0;
+    SEG.forEach(function(g){
+      var show=!!on[g.k], wd=show?g.h/TOTAL*100:0;
+      if(g.k==="L"&&split){
+        var done=0;CAUSES.forEach(function(c,i){if(i<cau)done+=SEG.filter(function(x){return x.k===c})[0].h});
+        rest=3200-done;wd=rest/TOTAL*100;
+      }
+      $("b"+g.k).style.width=wd.toFixed(2)+"%";
+      var listed=show||(g.k==="L"&&rec>=3);
+      $("e"+g.k).classList.toggle("shown",listed);
+      if(show&&g.k!=="L")explained+=g.h;
+    });
+    $("eL").classList.toggle("struck",split);
+    var unexplained=rec>=3?(split?rest:5500):0;
+    ATK.forEach(function(a,i){
+      var el=$("a"+i),vis=i<aShown;
+      if(vis&&el.hidden){el.hidden=false;el.classList.add("in")}
+      if(!vis){el.hidden=true;el.classList.remove("in")}
+    });
+    $("empty").hidden=aShown>0;
+    $("cH").textContent=rec>=1||s>3?fmt(TOTAL):"0";
+    $("cE").textContent=fmt(explained);
+    $("cU").textContent=fmt(unexplained);
+    $("cA").textContent=aShown;
+    $("nowT").textContent=SCENES[s].t+(s===4&&tested&&!split?" · data tests passed":"");
+    $("nowP").textContent=SCENES[s].p;
+    $("now").classList.toggle("defending",s>=6);
+    $("out").classList.toggle("live",s===LAST&&k>=SCENES[LAST].max);
+    [].forEach.call(stepsEl.querySelectorAll("button"),function(b,bi){
+      b.classList.toggle("on",bi+1===s);b.classList.toggle("done",bi+1<s);
+      if(bi+1===s)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current");
+    });
+    var atEnd=s===LAST&&k>=SCENES[LAST].max;
+    $("play").textContent=playing?"Pause":(atEnd?"Replay":"Play");
+  }
+  function schedule(ms){clearTimeout(timer);if(playing)timer=setTimeout(tick,ms)}
+  function tick(){
+    if(k<SCENES[s].max){k++;render();
+      if(k>=SCENES[s].max){if(s===LAST){playing=false;render();return}schedule(2600)}
+      else schedule(s===1?450:(s===6?2200:1300));}
+    else if(s<LAST){s++;k=0;render();schedule(1500);}
+    else{playing=false;render();}
+  }
+  function jump(to){playing=false;clearTimeout(timer);s=Math.max(1,Math.min(LAST,to));k=SCENES[s].max;render()}
+  $("back").addEventListener("click",function(){jump(s-1)});
+  $("next").addEventListener("click",function(){jump(k<SCENES[s].max?s:s+1)});
+  $("play").addEventListener("click",function(){
+    if(playing){playing=false;clearTimeout(timer);render();return}
+    if(s===LAST&&k>=SCENES[LAST].max){s=1;k=0}
+    playing=true;render();schedule(500);
+  });
+  if(reduce){playing=false;s=LAST;k=SCENES[LAST].max;render()}
+  else{render();schedule(1400)}
+})();
+</script>
+</body>
+</html>

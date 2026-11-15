@@ -4,9 +4,16 @@
 
 Everyone is writing a blog these days, and reading them all is tiring. So start with the picture. The concept animation runs for about a minute and shows the whole idea: one bar of deployed hours, explained piece by piece, until you can see where the effort leaked and who owns it.
 
-1. **Watch it.** [Download the concept animation](https://drive.google.com/file/d/1JSdN7a5u53bREhoVbC_lpwD7CDXnLD9o/view), open it in your browser and press Play.
+1. **Watch it.** Open [`visual-concept/renewal-defender-concept.html`](visual-concept/renewal-defender-concept.html), download it with the button at the top right of the file, open it in your browser and press Play. It is one file, with the animated JavaScript inside it.
 2. **Liked the concept? Read the blog.** [The blog](https://drive.google.com/file/d/11qdfwor13zU-75hC1yDs98E0NMQ7t6Pj/view) covers the method, the data form and what to do when data is missing.
 3. **Convinced? Run it.** Load [`SKILL.md`](renewal-defender/SKILL.md) into your AI chat window, fill in the data form with whatever you have, and ask for the reconciliation of the last three months. The same text is in [`SKILL.txt`](renewal-defender/SKILL.txt) if a markdown file is awkward to download.
+
+## What is in this repository
+
+| Folder | Contents |
+| --- | --- |
+| [`visual-concept/`](visual-concept) | The animated concept model: six steps, from the data form to the attack sheet |
+| [`renewal-defender/`](renewal-defender) | The skill itself, as `SKILL.md` and as `SKILL.txt` |
 
 ## What it does
 
